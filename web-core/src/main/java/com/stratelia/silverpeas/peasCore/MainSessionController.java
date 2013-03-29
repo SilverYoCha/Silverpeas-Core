@@ -53,6 +53,7 @@ import com.stratelia.webactiv.util.exception.SilverpeasException;
 import org.silverpeas.admin.user.constant.UserAccessLevel;
 import org.silverpeas.core.admin.OrganisationController;
 import org.silverpeas.core.admin.OrganisationControllerFactory;
+import org.silverpeas.multiedition.MultiEditionContext;
 import org.silverpeas.subscription.SubscriptionContext;
 
 import javax.ejb.RemoveException;
@@ -97,6 +98,7 @@ public class MainSessionController implements Clipboard {
   String m_CurrentSpaceId = null;
   String m_CurrentComponentId = null;
   private SubscriptionContext subscriptionContext = null;
+  private MultiEditionContext multiEditionContext = null;
   /**
    * Maintenance Mode *
    */
@@ -246,6 +248,15 @@ public class MainSessionController implements Clipboard {
     }
     return subscriptionContext;
   }
+
+  // ------------------- Multi Edition Functions -----------------------------
+  public MultiEditionContext getMultiEditionContext() {
+    if (multiEditionContext == null) {
+      multiEditionContext = new MultiEditionContext(getCurrentUserDetail(), userPreferences);
+    }
+    return multiEditionContext;
+  }
+
 
   // ------------------- AlertUser Functions -----------------------------
   public AlertUser getAlertUser() {

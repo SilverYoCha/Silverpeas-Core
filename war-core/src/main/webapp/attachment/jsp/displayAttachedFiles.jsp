@@ -970,10 +970,17 @@ value: <c:out value="${silfn:isI18n() && not isVersionActive}" />
   }
 
   function view(target, attachmentId) {
-    $(target).view("viewAttachment", {
-      componentInstanceId: "<c:out value="${sessionScope.Silverpeas_Attachment_ComponentId}" />",
-      attachmentId: attachmentId
-    });
+    $('<form>', {
+      method : 'post',
+      action : '<c:url value="/RMultiEdition/jsp/Main"/>'
+    }).appendTo(document.body).append($('<input>',
+            {type : 'hidden', name : 'documentId', value : attachmentId}), $('<input>',
+            {type : 'hidden', name : 'instanceId', value : '<c:out value="${sessionScope.Silverpeas_Attachment_ComponentId}" />'}),
+            $('<input>', {type : 'hidden', name : 'callerUrl', value : 'blablabla'})).submit();
+    <%--$(target).view("viewAttachment", {--%>
+      <%--componentInstanceId: "<c:out value="${sessionScope.Silverpeas_Attachment_ComponentId}" />",--%>
+      <%--attachmentId: attachmentId--%>
+    <%--});--%>
     return false;
   }
 </script>

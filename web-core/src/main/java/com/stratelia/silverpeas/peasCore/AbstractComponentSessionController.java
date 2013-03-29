@@ -37,6 +37,7 @@ import com.stratelia.webactiv.beans.admin.UserDetail;
 import com.stratelia.webactiv.util.ResourceLocator;
 import org.silverpeas.admin.user.constant.UserAccessLevel;
 import org.silverpeas.core.admin.OrganisationController;
+import org.silverpeas.multiedition.MultiEditionContext;
 import org.silverpeas.subscription.SubscriptionContext;
 
 import java.io.UnsupportedEncodingException;
@@ -404,8 +405,7 @@ public class AbstractComponentSessionController implements ComponentSessionContr
    */
   @Override
   public String getComponentParameterValue(String parameterName) {
-    return controller.getComponentParameterValue(
-        getComponentId(), parameterName);
+    return controller.getComponentParameterValue(getComponentId(), parameterName);
   }
 
   /**
@@ -491,6 +491,10 @@ public class AbstractComponentSessionController implements ComponentSessionContr
 
   public SubscriptionContext getSubscriptionContext() {
     return controller.getSubscriptionContext();
+  }
+
+  public MultiEditionContext getMultiEditionContext() {
+    return controller.getMultiEditionContext();
   }
 
   public AlertUser getAlertUser() {

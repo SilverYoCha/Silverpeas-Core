@@ -376,6 +376,19 @@
       <groupId>org.netbeans.api</groupId>
       <artifactId>org-openide-filesystems</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.google.http-client</groupId>
+      <artifactId>google-http-client-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3_min</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.apis</groupId>
+      <artifactId>google-api-services-drive</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
