@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2000 - 2013 Silverpeas
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    As a special exception to the terms and conditions of version 3.0 of
+    the GPL, you may redistribute this Program in connection with Free/Libre
+    Open Source Software ("FLOSS") applications as described in Silverpeas's
+    FLOSS exception.  You should have received a copy of the text describing
+    the FLOSS exception, and it is also available here:
+    "http://www.silverpeas.org/docs/core/legal/floss_exception.html"
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<dataset>
+
+  <!-- Targets are uniques, so personal space is specify one and only one times as below -->
+  <st_event_targets id="personal_space_users" rgbColor="[NULL]"
+                    instanceId="[NULL]" targetResourceUniqueId="[NULL]"
+                    createdBy="1" createDate="2013-12-25 10:30:00.0"
+                    lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <!--#####-->
+  <!--Event "Personal Event - 00" :-->
+  <!--- personal user space-->
+  <!--- on 15/12/2013 from 11AM to 1h30PM-->
+  <!--#####-->
+
+  <st_events id="personal_user_space_00_event" targetId="personal_space_users"
+             eventType="INDIVIDUAL" privacyType="PRIVATE" eventPriority="0"
+             title="Personal Event - 00" duration="9000000" rgbColor="[NULL]"
+             createdBy="1" createDate="2013-12-25 10:30:00.0"
+             lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_event_planning id="personal_user_space_00_planning"
+                     eventId="personal_user_space_00_event"
+                     beginDate="1387101600000" endDate="1387110600000"
+                     createdBy="1" createDate="2013-12-25 11:30:00.0"
+                     lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <!--#####-->
+  <!--Event "Personal Event - 01" :-->
+  <!--- personal user space -->
+  <!--- from 26/12/2013 23h30PM to 27/12/2013 0h20AM -->
+  <!--- with specific color on event : RED -->
+  <!--- with high prority : HIGH -->
+  <!--- with privacy : PUBLIC -->
+  <!--#####-->
+
+  <st_events id="personal_user_space_01_event" targetId="personal_space_users"
+             eventType="INDIVIDUAL" privacyType="PUBLIC" eventPriority="3"
+             title="Personal Event - 01" duration="101700000" rgbColor="0,0,0"
+             createdBy="2" createDate="2013-12-25 10:30:00.0"
+             lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_event_planning id="personal_user_space_01_planning"
+                     eventId="personal_user_space_01_event"
+                     beginDate="1387522800000" endDate="1387624500000"
+                     createdBy="1" createDate="2013-12-25 11:30:00.0"
+                     lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <!--#####-->
+  <!--Event "Resource Event - 02" :-->
+  <!--- On a resource (but no component instance id)-->
+  <!--- from 26/12/2013 23h30PM to 27/12/2013 0h20AM-->
+  <!--- with specific color on target : GREEN-->
+  <!--- with specific color on event : RED-->
+  <!--- with high prority : LOW-->
+  <!--- with privacy : ATTENDEE-->
+  <!--- with description info : "Description info"-->
+  <!--- with target url access info : "Target URL access info"-->
+  <!--- with unknown info : "Unknown info"-->
+  <!--- with remind of 15 minutes-->
+  <!--- with 2 attendees :-->
+  <!--  . userId 26-->
+  <!--    > status = NOT_YET_ANSWERED-->
+  <!--  . userId 38-->
+  <!--    > status = PARTICIPATE-->
+  <!--#####-->
+
+  <st_event_targets id="resource_global_02" rgbColor="0,255,0"
+                    instanceId="[NULL]" targetResourceUniqueId="resource_global_02_uniqueId"
+                    createdBy="3" createDate="2013-12-25 10:30:00.0"
+                    lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_events id="resource_global_02_event" targetId="resource_global_02"
+             eventType="RESOURCE" privacyType="ATTENDEE" eventPriority="1"
+             title="Global Resource Event - 02" duration="3000000" rgbColor="255,0,0"
+             createdBy="3" createDate="2013-12-25 10:30:00.0"
+             lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_event_planning id="resource_global_02_planning"
+                     eventId="resource_global_02_event"
+                     beginDate="1388097000000" endDate="1388100000000"
+                     createdBy="3" createDate="2013-12-25 11:30:00.0"
+                     lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_event_infos id="resource_global_02_info_UNKNOWN"
+                  eventId="resource_global_02_event"
+                  infoType="UNKNOWN" content="Unknown info"
+                  createdBy="3" createDate="2013-12-25 11:30:00.0"
+                  lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+  <st_event_infos id="resource_global_02_info_TARGET_URL_ACCESS"
+                  eventId="resource_global_02_event"
+                  infoType="TARGET_URL_ACCESS" content="Target URL access info"
+                  createdBy="3" createDate="2013-12-25 11:30:00.0"
+                  lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+  <st_event_infos id="resource_global_02_info_DESCRIPTION"
+                  eventId="resource_global_02_event"
+                  infoType="DESCRIPTION" content="Description info"
+                  createdBy="3" createDate="2013-12-25 11:30:00.0"
+                  lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_event_reminds id="resource_global_02_remind"
+                    eventId="resource_global_02_event" timeBeforeStart="900000"
+                    createdBy="3" createDate="2013-12-25 11:30:00.0"
+                    lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+  <st_event_attendees id="resource_global_02_attendee_26"
+                      eventId="resource_global_02_event" attendeeType="USER_OPTIONAL"
+                      attendeeId="26" attendeeStatus="NOT_YET_ANSWERED"
+                      createdBy="3" createDate="2013-12-25 11:30:00.0"
+                      lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+  <st_event_attendees id="resource_global_02_attendee_38"
+                      eventId="resource_global_02_event" attendeeType="USER_REQUIRED"
+                      attendeeId="38" attendeeStatus="PARTICIPATE"
+                      createdBy="3" createDate="2013-12-25 11:30:00.0"
+                      lastUpdateDate="[NULL]" lastUpdatedBy="[NULL]" version="0"/>
+
+</dataset>
