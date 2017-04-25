@@ -23,6 +23,7 @@ package com.stratelia.webactiv.jaas;
 
 import com.silverpeas.accesscontrol.AccessController;
 import com.silverpeas.accesscontrol.AccessControllerProvider;
+import com.silverpeas.jcrutil.SilverpeasJcrWebdavContext;
 
 import java.security.Principal;
 import java.util.regex.Pattern;
@@ -31,20 +32,18 @@ public class SilverpeasUserPrincipal implements Principal {
 
   private String userId;
   private boolean administrator;
-  private static final Pattern COMPONENTID_PATTERN = Pattern.compile("^([a-zA-Z]+)([0-9]+)$");
+  private String jcrDocumentUrlLocationOfWebdavContext;
 
   public SilverpeasUserPrincipal(String userId, boolean administrator) {
     this.userId = userId;
     this.administrator = administrator;
+    this.jcrDocumentUrlLocationOfWebdavContext = null;
   }
 
-  public boolean canAccess(String componentId) {
-    if (COMPONENTID_PATTERN.matcher(componentId).find()) {
-      AccessController<String> accessController =
-          AccessControllerProvider.getAccessController("componentAccessController");
-      return accessController.isUserAuthorized(userId, componentId);
-    }
-    return false;
+  public SilverpeasUserPrincipal(String userId, boolean administrator,
+      String jcrDocumentUrlLocationOfWebdavContext) {
+    this(userId, administrator);
+    this.jcrDocumentUrlLocationOfWebdavContext = jcrDocumentUrlLocationOfWebdavContext;
   }
 
   public String getUserId() {
@@ -58,5 +57,9 @@ public class SilverpeasUserPrincipal implements Principal {
   @Override
   public String getName() {
     return userId;
+  }
+
+  public String getJcrDocumentUrlLocationOfWebdavContext() {
+    return jcrDocumentUrlLocationOfWebdavContext;
   }
 }

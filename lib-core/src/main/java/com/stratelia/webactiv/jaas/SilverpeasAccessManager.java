@@ -105,10 +105,10 @@ public class SilverpeasAccessManager implements AccessManager {
     if (!initialized) {
       throw new IllegalStateException("not initialized");
     }
-    if (id.denotesNode() && !isSystem) {
+    if (!isSystem && id.denotesNode()) {
       Path path = manager.getPath(id);
       if (path.getDepth() > 2 && validateNode(path)) {
-        return isPathAutorized(path);
+        return isPathAuthorized(path);
       } else if (validateFileNode(id)) {
         Set<SilverpeasUserPrincipal> principals = subject.getPrincipals(
             SilverpeasUserPrincipal.class);
@@ -172,14 +172,36 @@ public class SilverpeasAccessManager implements AccessManager {
     }
   }
 
-  protected boolean isPathAutorized(Path path) {
+  protected boolean isPathAuthorized(Path path) {
     Set<SilverpeasUserPrincipal> principals = subject.getPrincipals(SilverpeasUserPrincipal.class);
-    Path.Element[] elements = path.getElements();
+    final Path.Element[] elements = path.getElements();
+    StringBuilder jcrPathToVerify = new StringBuilder();
+    for (Path.Element element : elements) {
+      jcrPathToVerify.append(element.getName().getLocalName()).append("/");
+    }
     for (SilverpeasUserPrincipal principal : principals) {
-      for (Path.Element element : elements) {
-        if (principal.isAdministrator() || principal.canAccess(element.getName().getLocalName())) {
-          return true;
-        }
+      if (principal.isAdministrator()) {
+        return true;
+      }
+      if (isWebdavPathAuthorized(principal, jcrPathToVerify.toString())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isWebdavPathAuthorized(final SilverpeasUserPrincipal principal,
+      final String jcrPathToVerify) {
+    final String jcrDocumentUrlLocationOfWebdavContext =
+        principal.getJcrDocumentUrlLocationOfWebdavContext();
+    if (jcrDocumentUrlLocationOfWebdavContext != null) {
+      StringBuilder authorizedPath = new StringBuilder();
+      authorizedPath.append(jcrDocumentUrlLocationOfWebdavContext);
+      if (!authorizedPath.toString().endsWith("/")) {
+        authorizedPath.append("/");
+      }
+      if (authorizedPath.toString().contains(jcrPathToVerify)) {
+        return true;
       }
     }
     return false;
@@ -284,7 +306,7 @@ public class SilverpeasAccessManager implements AccessManager {
   public boolean isGranted(Path path, int permissions) throws RepositoryException {
     if (!isSystem && denotesNode(path)) {
       if (path.getDepth() > 2 && validateNode(path)) {
-        return isPathAutorized(path);
+        return isPathAuthorized(path);
       } else if (validateFileNode(path)) {
         Set<SilverpeasUserPrincipal> principals = subject.getPrincipals(
             SilverpeasUserPrincipal.class);

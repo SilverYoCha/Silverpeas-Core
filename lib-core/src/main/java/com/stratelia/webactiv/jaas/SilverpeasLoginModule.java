@@ -41,7 +41,7 @@ import org.silverpeas.authentication.AuthenticationService;
 import org.silverpeas.util.crypto.CryptMD5;
 
 import com.silverpeas.jcrutil.security.impl.DigestCredentials;
-import com.silverpeas.jcrutil.security.impl.SilverpeasCredentials;
+import com.silverpeas.jcrutil.security.impl.SilverpeasWebDavCredentials;
 import com.silverpeas.jcrutil.security.impl.SilverpeasSystemCredentials;
 import com.silverpeas.jcrutil.security.impl.SilverpeasSystemPrincipal;
 
@@ -142,10 +142,14 @@ public class SilverpeasLoginModule implements LoginModule {
             principals.add(new AnonymousPrincipal());
           }
           authenticated = true;
-        } else if (creds instanceof SilverpeasCredentials) {
-          String theUserId = ((SilverpeasCredentials) creds).getUserId();
-          SilverpeasUserPrincipal principal = new SilverpeasUserPrincipal(theUserId, isRoot(
-              theUserId));
+        } else if (creds instanceof SilverpeasWebDavCredentials) {
+          final SilverpeasWebDavCredentials webDavCredentials = (SilverpeasWebDavCredentials) creds;
+          String theUserId = webDavCredentials.getUserId();
+          String jcrDocumentUrlLocationOfWebdavContext =
+              webDavCredentials.getJcrDocumentUrlLocationOfWebdavContext();
+          SilverpeasUserPrincipal principal =
+              new SilverpeasUserPrincipal(theUserId, isRoot(theUserId),
+                  jcrDocumentUrlLocationOfWebdavContext);
           principals.add(principal);
           authenticated = true;
         } else if (creds instanceof SilverpeasSystemCredentials) {

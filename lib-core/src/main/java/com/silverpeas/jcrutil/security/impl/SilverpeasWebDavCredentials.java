@@ -26,16 +26,23 @@ package com.silverpeas.jcrutil.security.impl;
 
 import javax.jcr.Credentials;
 
-public class SilverpeasCredentials implements Credentials {
+public class SilverpeasWebDavCredentials implements Credentials {
   private static final long serialVersionUID = 6060389867968541498L;
 
   private String userId;
+  private String jcrDocumentUrlLocationOfWebdavContext;
 
-  public SilverpeasCredentials(String userId) {
+  public SilverpeasWebDavCredentials(String userId,
+      final String jcrDocumentUrlLocationOfWebdavContext) {
     this.userId = userId;
+    this.jcrDocumentUrlLocationOfWebdavContext = jcrDocumentUrlLocationOfWebdavContext;
   }
 
   public String getUserId() {
     return this.userId;
+  }
+
+  public String getJcrDocumentUrlLocationOfWebdavContext() {
+    return jcrDocumentUrlLocationOfWebdavContext;
   }
 }

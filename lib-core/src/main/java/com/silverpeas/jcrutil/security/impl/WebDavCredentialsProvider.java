@@ -21,6 +21,7 @@
 
 package com.silverpeas.jcrutil.security.impl;
 
+import com.silverpeas.jcrutil.SilverpeasJcrWebdavContext;
 import com.stratelia.webactiv.beans.admin.UserDetail;
 import org.apache.jackrabbit.server.CredentialsProvider;
 import org.silverpeas.cache.service.CacheServiceFactory;
@@ -42,12 +43,14 @@ public class WebDavCredentialsProvider implements CredentialsProvider {
   public Credentials getCredentials(final HttpServletRequest request)
       throws LoginException, ServletException {
     Credentials credentials;
-    String authToken = getWebdavContext(request.getPathInfo()).getToken();
+    final SilverpeasJcrWebdavContext webdavContext = getWebdavContext(request.getPathInfo());
+    String authToken = webdavContext.getToken();
     if (!authToken.isEmpty()) {
       UserDetail user =
           CacheServiceFactory.getApplicationCacheService().get(authToken, UserDetail.class);
       if (user != null) {
-        credentials = new SilverpeasCredentials(user.getId());
+        credentials = new SilverpeasWebDavCredentials(user.getId(),
+            webdavContext.getJcrDocumentUrlLocation());
       } else {
         return null;
       }
