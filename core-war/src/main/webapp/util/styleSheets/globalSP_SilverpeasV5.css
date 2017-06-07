@@ -4058,6 +4058,73 @@ input.search:focus {
   color: #444;
 }
 
+.qtip-drop-down-silverpeas {
+  max-width: none !important;
+}
+
+.select-user-group-container .inline-layout {
+   float: left;
+ }
+
+.select-user-group-container input.search {
+  border: 1px solid #999;
+  max-width: 75px;
+  vertical-align: middle;
+}
+.select-user-group-container a.search {
+  line-height: 1em;
+}
+
+.select-user-group-selection-container {
+  max-height: 450px;
+  width: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.select-user-group-selection-container .selection-lists {
+  display: inline-flex;
+}
+
+.select-user-group-selection-container .selection-lists .list-separator {
+  width: 1px;
+  background-color: #E0E0E0;
+  margin: 0 1em 0 1em;
+}
+
+.select-user-group-selection-container ul {
+  display: grid;
+}
+
+.select-user-group-selection-container .access-list li {
+  display: inline-flex;
+  padding: 0.25em;
+  margin-right: 0;
+}
+
+.select-user-group-selection-container .access-list li:last-child {
+  margin-bottom: 0;
+}
+
+.select-user-group-selection-container .access-list li {
+  display: inline-flex;
+  padding: 0.25em;
+}
+
+.select-user-group-selection-container .access-list li span {
+  line-height: initial;
+}
+
+.select-user-group-selection-container .access-list.group li img{
+  width: 16px;
+  height: 16px;
+}
+
+
+.select-user-group-selection-container .access-list li .extra-info {
+  font-size: 7.5pt;
+}
+
 .userPanel .listing_users, .userPanel .listing_groups  {
   position:relative;
 }
@@ -5556,7 +5623,11 @@ div.user-card .field{
   padding:0 4px 2px 6px;
 }
 
-div.user-card .userToZoom{
+.userToZoom {
+  white-space: nowrap;
+}
+
+div.user-card .userToZoom {
   color:#000;
   font-weight:bold;
 }
@@ -5833,6 +5904,7 @@ a.navigation-button {
   list-style-type:none;
   margin:0;
   padding:0;
+  white-space: nowrap;
 }
 
 .access-list li {

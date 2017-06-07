@@ -174,6 +174,7 @@ class WebCommonLookAndFeel {
         getJavaScriptTag(contextPath + "/util/javaScript/polyfill/eventListenerIEPolyfill.min.js"));
     code.append(
         getJavaScriptTag(contextPath + "/util/javaScript/polyfill/silverpeas-polyfills.js"));
+    code.append(getJavaScriptTag(contextPath + "/util/javaScript/mousetrap.min.js"));
 
     // append javascript
     // append javascript

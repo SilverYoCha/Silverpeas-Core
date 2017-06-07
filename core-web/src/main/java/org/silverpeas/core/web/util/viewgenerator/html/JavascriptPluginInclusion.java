@@ -741,9 +741,11 @@ public class JavascriptPluginInclusion {
   public static ElementContainer includeListOfUsersAndGroups(final ElementContainer xhtml,
       final String language) {
     includePopup(xhtml);
+    includeQTip(xhtml);
     xhtml.addElement(scriptContent(JavascriptBundleProducer
         .bundleVariableName("UserGroupListBundle")
         .add(ResourceLocator.getGeneralLocalizationBundle(language),
+            "GML.user_s",
             "GML.delete",
             "GML.deleteAll",
             "GML.action.remove",
