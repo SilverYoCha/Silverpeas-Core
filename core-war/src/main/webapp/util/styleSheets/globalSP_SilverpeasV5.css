@@ -4062,6 +4062,52 @@ input.search:focus {
   max-width: none !important;
 }
 
+.select-user-group-container .selectize-dropdown,
+.select-user-group-container .selectize-input {
+  width: auto !important;
+}
+
+.select-user-group-container .type-group,
+.select-user-group-container .type-user {
+  white-space: nowrap;
+}
+
+.select-user-group-container .selectize-control .type-group,
+.select-user-group-container .selectize-control .type-user {
+  display: flex;
+}
+
+.select-user-group-container .selectize-input .type-group,
+.select-user-group-container .selectize-input .type-user {
+  display: inline-flex;
+}
+
+.select-user-group-container .selectize-control .type-group img {
+  width: 16px;
+  height: 16px;
+}
+
+.select-user-group-container .selectize-control img.user-avatar {
+  border: 1px solid #ccc;
+  width: 20px;
+  height: 100%;
+}
+
+
+.select-user-group-container .selectize-control .main-info {
+  line-height: initial;
+}
+
+.select-user-group-container .selectize-control .extra-info {
+  font-size: 7.5pt;
+  line-height: initial;
+}
+
+.select-user-group-container .search-input-container {
+  display: inline-flex;
+  min-width: 250px;
+}
+
 .select-user-group-container .inline-layout {
    float: left;
  }
@@ -4071,6 +4117,7 @@ input.search:focus {
   max-width: 75px;
   vertical-align: middle;
 }
+
 .select-user-group-container a.search {
   line-height: 1em;
 }
@@ -4111,18 +4158,25 @@ input.search:focus {
   padding: 0.25em;
 }
 
-.select-user-group-selection-container .access-list li span {
+.select-user-group-selection-container .access-list .main-info {
   line-height: initial;
 }
 
-.select-user-group-selection-container .access-list.group li img{
+
+.select-user-group-selection-container .access-list .extra-info {
+  font-size: 7.5pt;
+  line-height: initial;
+}
+
+.select-user-group-selection-container .access-list.group img{
   width: 16px;
   height: 16px;
 }
 
-
-.select-user-group-selection-container .access-list li .extra-info {
-  font-size: 7.5pt;
+.select-user-group-selection-container .access-list img.user-avatar {
+  border: 1px solid #ccc;
+  width: 20px;
+  height: auto;
 }
 
 .userPanel .listing_users, .userPanel .listing_groups  {

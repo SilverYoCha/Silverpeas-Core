@@ -24,6 +24,8 @@
 
 (function() {
 
+  var VANILLA_PLUGIN_USE = false;
+
   var SELECT_NB_ITEM_PER_TYPE = 20;
   var SELECTION_TYPE = {
     USER : 0,
@@ -58,7 +60,7 @@
   var LABEL_SELECT = UserGroupListBundle.get("GML.action.select");
   var LABEL_LIST_CHANGED = UserGroupListBundle.get("GML.list.changed.message");
 
-  var __idCounter = 0;
+  var __globalIdCounter = 0;
 
   var UserGroupRequester = function(options) {
     this.options = extendsObject({
@@ -168,8 +170,80 @@
     };
   };
 
+  var UserGroupSelectize = function(userGroupSelectInstance) {
+    var _sequential = sp.promise.resolveDirectlyWith();
+    var _self = this;
+    var __selectize = jQuery(userGroupSelectInstance.context.searchInput).selectize({
+      valueField: 'id',
+      placeholder: "          ",
+      options: [],
+      create: false,
+      highlight: false,
+      hideSelected : true,
+      loadThrottle : 300,
+      maxItems : userGroupSelectInstance.options.multiple ? null : 1,
+      maxOptions : (SELECT_NB_ITEM_PER_TYPE * 2) - 1,
+      render: {
+        option: function(data, escape) {
+          var option = data.getElement();
+          option.classList.add('option');
+          return option;
+        },
+        item: function(data, escape) {
+          var item = data.getElement();
+          item.classList.add('item');
+          return item;
+        }
+      },
+      score: function(search) {
+        return function(item) {
+          return item.score;
+        };
+      },
+      load: function(query, callback) {
+        _sequential.then(function() {
+          __selectize.loadedSearches = {};
+          userGroupSelectInstance.context.searchInput.processQuery(query, function(ajaxPerformed) {
+            for(var itemId in __selectize.options) {
+              __selectize.options[itemId].score = 0;
+              if (__selectize.items.indexOf(itemId) < 0) {
+                __selectize.removeOption(itemId);
+              }
+            }
+            __selectize.refreshOptions(true);
+            if (ajaxPerformed) {
+              var all = [];
+              userGroupSelectInstance.context.groupItems.forEach(function(item) {
+                item.id = 'group-' + item.getId();
+                item.name = item.getFullName();
+                item.score = 1;
+                all.push(item);
+              });
+              userGroupSelectInstance.context.userItems.forEach(function(item) {
+                item.id = 'user-' + item.getId();
+                item.name = item.getFullName();
+                item.score = 1;
+                all.push(item);
+              });
+              callback(all);
+            }
+          });
+        });
+      }
+    })[0].selectize;
+    this.show = function() {
+      __selectize.open();
+    };
+    this.hide = function() {
+      __selectize.close();
+    };
+    this.refresh = function() {
+    };
+  };
+
   window.UserGroupSelect = function(options) {
     applyReadyBehaviorOn(this);
+    var __idCounter = __globalIdCounter;
 
     this.options = extendsObject({
       hideDeactivatedState : true,
@@ -196,7 +270,8 @@
     this.options.selectionType = SELECTION_TYPE.decode(this.options.selectionType);
 
     if (StringUtil.isNotDefined(this.options.userPanelId)) {
-      this.options.userPanelId = "user-group-select-" + (__idCounter++);
+      __globalIdCounter = __globalIdCounter + 1;
+      this.options.userPanelId = "user-group-select-" + __idCounter;
     }
 
     var initialUserIds = __convertToString(this.options.initialUserIds);
@@ -219,7 +294,7 @@
 
     var __requester = new UserGroupRequester(options);
 
-    var _doSearchWith = function(search) {
+    var _doSearchWith = function(search, callback) {
       var userDeferred = sp.promise.deferred();
       var groupDeferred = sp.promise.deferred();
       var searchDone = [userDeferred.promise, groupDeferred.promise];
@@ -244,6 +319,7 @@
           }.bind(this));
       return sp.promise.whenAllResolved(searchDone).then(function() {
         this.context.dropPanel.refresh();
+        callback(true);
       }.bind(this));
     }.bind(this);
 
@@ -253,33 +329,35 @@
         this.context.searchInput.focus();
       }.bind(this));
 
-      var __normalizedValue = "";
       var __queryRunning = false;
       var __lastUnperformedQuery = "";
-      var __performSearch = function(value) {
+      var __performSearch = function(value, callback) {
         __queryRunning = true;
         __lastUnperformedQuery = "";
         var __doLastUnperformedQuery = function() {
           __queryRunning = false;
           if (__lastUnperformedQuery) {
-            __performSearch(__lastUnperformedQuery);
+            __performSearch(__lastUnperformedQuery, callback);
           }
         };
-        _doSearchWith(value).then(__doLastUnperformedQuery, __doLastUnperformedQuery);
+        _doSearchWith(value, callback).then(__doLastUnperformedQuery, __doLastUnperformedQuery);
       };
-      this.context.searchInput.addEventListener('keyup', function() {
-        var __value = (this.context.searchInput.value || "").toLowerCase();
+      this.context.searchInput.processQuery = function(value, callback) {
+        var __value = (value || "").toLowerCase();
         __value = __value.replace(/[^a-z0-9éèäâïîüûùçàôö]/g,'');
-        if (__value && __value !== __normalizedValue && __value.length > 2) {
+        if (__value && __value.length > 2) {
           if (!__queryRunning) {
-            __performSearch(__value);
+            __performSearch(__value, callback);
           } else {
             __lastUnperformedQuery = __value;
           }
         } else {
+          callback(false);
           this.context.dropPanel.hide();
         }
-        __normalizedValue = __value;
+      }.bind(this);
+      this.context.searchInput.addEventListener('keyup', function() {
+        this.context.searchInput.processQuery(this.context.searchInput.value);
       }.bind(this));
       this.context.searchInput.addEventListener('focus', function() {
         var __value = (this.context.searchInput.value || "").toLowerCase();
@@ -293,14 +371,24 @@
       this.context.rootContainer = document.querySelector("#" + this.options.rootContainerId);
 
       var __searchContainer = document.createElement('div');
-      this.context.searchInput = document.createElement('input');
-      this.context.searchInput.type = 'text';
+      __searchContainer.classList.add('search-input-container');
+      var __PanelConstructor;
+      if (VANILLA_PLUGIN_USE) {
+        this.context.searchInput = document.createElement('input');
+        this.context.searchInput.type = 'text';
+        this.context.searchInput.name = 'search-' + __idCounter;
+        this.context.searchInput.autocomplete = 'off';
+        __PanelConstructor = UserGroupSelectionPanel;
+      } else {
+        this.context.searchInput = document.createElement('select');
+        __searchContainer.appendChild(this.context.searchInput);
+        __PanelConstructor = UserGroupSelectize;
+      }
       this.context.searchInput.id = 'search-' + __idCounter;
-      this.context.searchInput.name = 'search-' + __idCounter;
-      this.context.searchInput.autocomplete = 'off';
-      this.context.searchInput.classList.add('search');
-      __searchContainer.appendChild(this.context.searchInput);
+      this.context.searchInput.classList.add('search-input','search');
       this.context.rootContainer.appendChild(__searchContainer);
+      __searchContainer.appendChild(this.context.searchInput);
+      this.context.dropPanel = new __PanelConstructor(this);
 
       var __userPanelSelect = document.createElement('a');
       __userPanelSelect.href = '#';
@@ -333,7 +421,6 @@
       }
 
       __createHiddenInputs(this, this.context.rootContainer);
-      this.context.dropPanel = new UserGroupSelectionPanel(this);
 
       if (!this.context.readOnly) {
         jQuery(this.context.userSelectionInput).on('change', function() {
@@ -347,7 +434,7 @@
         }.bind(this));
       }
 
-      if(this.options.displaySelection) {
+      if(VANILLA_PLUGIN_USE && this.options.displaySelection) {
         new ListOfUsersAndGroups({
           hideDeactivatedState : this.options.hideDeactivatedState,
           domainIdFilter : this.options.domainIdFilter,
@@ -381,6 +468,7 @@
 
   window.ListOfUsersAndGroups = function(options) {
     applyReadyBehaviorOn(this);
+    var __idCounter = __globalIdCounter;
 
     this.options = extendsObject({
       hideDeactivatedState : true,
@@ -405,7 +493,8 @@
     }, options);
 
     if (StringUtil.isNotDefined(this.options.userPanelId)) {
-      this.options.userPanelId = "user-group-list-" + (__idCounter++);
+      __globalIdCounter = __globalIdCounter + 1;
+      this.options.userPanelId = "user-group-list-" + __idCounter;
     }
 
     var initialUserIds = __convertToString(this.options.initialUserIds);
@@ -808,7 +897,7 @@
 
   function __createUserElement(userItem) {
     var intoList = !userItem.isSelectElement;
-    var li = document.createElement("li");
+    var li = document.createElement(intoList || VANILLA_PLUGIN_USE ? "li" : "div");
     li.classList.add("type-user");
     li.setAttribute("user-id", userItem.getId());
     var avatar = document.createElement("img");
@@ -853,7 +942,7 @@
 
   function __createGroupElement(groupItem) {
     var intoList = !groupItem.isSelectElement;
-    var li = document.createElement("li");
+    var li = document.createElement(intoList || VANILLA_PLUGIN_USE ? "li" : "div");
     li.classList.add("type-group");
     li.setAttribute("group-id", groupItem.getId());
     var avatar = document.createElement("img");

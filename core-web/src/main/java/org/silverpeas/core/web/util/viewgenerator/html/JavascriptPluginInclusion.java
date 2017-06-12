@@ -735,11 +735,24 @@ public class JavascriptPluginInclusion {
   }
 
   /**
+   * Includes the Silverpeas Plugin that handles complex item selection.
+   * @return the completed parent container.
+   */
+  public static ElementContainer includeSelectize(final ElementContainer xhtml,
+      final String language) {
+    xhtml.addElement(link(STYLESHEET_PATH + "selectize.css"));
+    xhtml.addElement(link(STYLESHEET_PATH + "silverpeas-selectize.css"));
+    xhtml.addElement(script(JAVASCRIPT_PATH + "selectize.min.js"));
+    return xhtml;
+  }
+
+  /**
    * Includes the Silverpeas Plugin that handles list of users and groups.
    * @return the completed parent container.
    */
   public static ElementContainer includeListOfUsersAndGroups(final ElementContainer xhtml,
       final String language) {
+    includeSelectize(xhtml, language);
     includePopup(xhtml);
     includeQTip(xhtml);
     xhtml.addElement(scriptContent(JavascriptBundleProducer
