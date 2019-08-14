@@ -1718,7 +1718,7 @@ class Admin implements Administration {
       String sProfileId = profileManager.createProfileInst(profileInst, driverFatherId);
       profileInst.setId(sProfileId);
 
-      if (profileInst.getObjectId() == -1 || profileInst.getObjectId() == 0) {
+      if (profileInst.getObjectId().isNotDefined() || profileInst.getObjectId().isRootNode()) {
         ComponentInst componentInstFather = getComponentInst(driverFatherId, null);
         componentInstFather = checkComponentInstanceById(componentInstFather, componentFatherId,
             nullComponentInstSupplier);
@@ -1728,9 +1728,6 @@ class Admin implements Administration {
           componentInstFather.setUpdaterUserId(userId);
           updateComponentInst(componentInstFather);
         }
-      }
-
-      if (profileInst.getObjectId() == -1 || profileInst.getObjectId() == 0) {
         cache.opAddProfile(profileManager.getProfileInst(sProfileId));
       }
       return sProfileId;
@@ -1759,7 +1756,7 @@ class Admin implements Administration {
     try {
       profileManager.deleteProfileInst(profile);
       if (StringUtil.isDefined(userId)
-          && (profile.getObjectId() == -1 || profile.getObjectId() == 0)) {
+          && (profile.getObjectId().isNotDefined() || profile.getObjectId().isRootNode())) {
         final String componentFatherId = profile.getComponentFatherId();
         int driverFatherId = getDriverComponentId(componentFatherId);
         ComponentInst component = getComponentInst(driverFatherId, null);
@@ -1771,7 +1768,7 @@ class Admin implements Administration {
         updateComponentInst(component);
       }
 
-      if (profile.getObjectId() == -1 || profile.getObjectId() == 0) {
+      if (profile.getObjectId().isNotDefined() || profile.getObjectId().isRootNode()) {
         cache.opRemoveProfile(profile);
       }
 
@@ -1796,7 +1793,7 @@ class Admin implements Administration {
     try {
       profileManager.updateProfileInst(newProfile);
       if (StringUtil.isDefined(
-          userId) && (newProfile.getObjectId() == -1 || newProfile.getObjectId() == 0)) {
+          userId) && (newProfile.getObjectId().isNotDefined() || newProfile.getObjectId().isRootNode())) {
         final String componentFatherId = newProfile.getComponentFatherId();
         int driverFatherId = getDriverComponentId(componentFatherId);
         ComponentInst component = getComponentInst(driverFatherId, null);
@@ -1806,7 +1803,7 @@ class Admin implements Administration {
         component.setUpdaterUserId(userId);
         updateComponentInst(component);
       }
-      if (newProfile.getObjectId() == -1 || newProfile.getObjectId() == 0) {
+      if (newProfile.getObjectId().isNotDefined() || newProfile.getObjectId().isRootNode()) {
         cache.opUpdateProfile(newProfile);
       }
 
