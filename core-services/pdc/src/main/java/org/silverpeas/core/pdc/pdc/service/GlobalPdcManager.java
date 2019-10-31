@@ -2258,7 +2258,7 @@ public class GlobalPdcManager implements PdcManager {
 
     try {
       // on récupère la liste de instance contenant tous les documents
-      alInstanceIds = contentManager.getInstanceId(silverContentIds);
+      alInstanceIds = contentManager.getResourceReferencesByContentIds(silverContentIds);
 
     } catch (ContentManagerException c) {
       throw new PdcRuntimeException(c);

@@ -23,6 +23,8 @@
  */
 package org.silverpeas.core.pdc.pdc.service;
 
+import org.silverpeas.core.ResourceReference;
+import org.silverpeas.core.admin.component.model.SilverpeasComponentInstance;
 import org.silverpeas.core.admin.user.model.User;
 import org.silverpeas.core.contribution.contentcontainer.content.ContentInterface;
 import org.silverpeas.core.contribution.contentcontainer.content.ContentManager;
@@ -38,6 +40,7 @@ import org.silverpeas.core.index.search.model.SearchResult;
 import org.silverpeas.core.index.search.qualifiers.TaxonomySearch;
 import org.silverpeas.core.pdc.pdc.model.AxisValueCriterion;
 import org.silverpeas.core.pdc.pdc.model.SearchContext;
+import org.silverpeas.core.util.MapUtil;
 import org.silverpeas.core.util.ServiceProvider;
 import org.silverpeas.core.util.logging.SilverLogger;
 
@@ -46,7 +49,9 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.silverpeas.core.contribution.contentcontainer.content
     .IGlobalSilverContentProcessor.PROCESSOR_NAME_SUFFIX;
@@ -112,40 +117,37 @@ public class PdcSearchProcessor implements SearchQueryProcessor {
     }
 
     ContentManager contentManager = ContentManagerProvider.getContentManager();
-    List<String> instanceIds = contentManager.getInstanceId(silverContentIds);
-
-    for (String instanceId : instanceIds) {
+    List<ResourceReference> instanceIds = contentManager.getResourceReferencesByContentIds(silverContentIds);
+    Map<String, List<ResourceReference>> byComponentName = new HashMap<>();
+    instanceIds.forEach(r -> {
+      final String componentName = SilverpeasComponentInstance.getComponentName(r.getComponentInstanceId());
+      MapUtil.putAddList(byComponentName, componentName, r);
+    });
+    byComponentName.forEach((c, l) -> {
       try {
-        // On récupère tous les silverContentId d'un instanceId
-        List<Integer> allSilverContentIds =
-            contentManager.getSilverContentIdByInstanceId(instanceId);
-
-        // une fois les SilverContentId de l'instanceId récupérés, on ne garde que ceux qui sont
-        // dans la liste résultat (alSilverContentIds).
-        allSilverContentIds.retainAll(silverContentIds);
-
-        ContentPeas contentP = contentManager.getContentPeas(instanceId);
+        ContentPeas contentP = contentManager.getContentPeas(c);
         if (contentP != null) {
           // we are going to search only SilverContent of this instanceId
           ContentInterface contentInterface = contentP.getContentInterface();
           List<SilverContentInterface> silverContentTempo =
-              contentInterface.getSilverContentById(allSilverContentIds, instanceId, userId);
+              contentInterface.getSilverContentById(l, userId);
 
           if (silverContentTempo != null) {
             silverContents.addAll(
-                transformSilverContentsToGlobalSilverContents(silverContentTempo, instanceId));
+                transformSilverContentsToGlobalSilverContents(silverContentTempo));
           }
         }
       } catch (Exception e) {
         SilverLogger.getLogger(this).error("Can't retrieve content from taxonomy for component {0}",
             new String[] {instanceId}, e);
       }
-    }
+    });
     return silverContents;
   }
 
   private List<GlobalSilverContent> transformSilverContentsToGlobalSilverContents(
-      List<SilverContentInterface> silverContentTempo, String instanceId) {
+      List<SilverContentInterface> silverContentTempo) {
+    String instanceId = silverContentTempo.iterator().next().getInstanceId();
     List<GlobalSilverContent> alSilverContents = new ArrayList<>(silverContentTempo.size());
     String contentProcessorPrefixId = "default";
     if (instanceId.startsWith("gallery")) {

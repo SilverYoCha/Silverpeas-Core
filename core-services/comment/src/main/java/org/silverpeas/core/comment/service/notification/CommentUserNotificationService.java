@@ -32,9 +32,9 @@ import org.silverpeas.core.comment.model.CommentPK;
 import org.silverpeas.core.comment.service.CommentService;
 import org.silverpeas.core.comment.service.CommentUserNotification;
 import org.silverpeas.core.contribution.model.Contribution;
+import org.silverpeas.core.notification.NotificationException;
 import org.silverpeas.core.notification.system.CDIResourceEventListener;
 import org.silverpeas.core.notification.user.builder.helper.UserNotificationHelper;
-import org.silverpeas.core.notification.NotificationException;
 import org.silverpeas.core.notification.user.client.NotificationMetaData;
 import org.silverpeas.core.notification.user.client.NotificationSender;
 import org.silverpeas.core.util.ServiceProvider;
@@ -96,11 +96,10 @@ public class CommentUserNotificationService extends CDIResourceEventListener<Com
           if (!recipients.isEmpty()) {
             Comment newComment =
                 getCommentService().getComment(new CommentPK(comment.getId(), componentInstanceId));
-            final NotificationMetaData notification = UserNotificationHelper.build(
+            UserNotificationHelper.buildAndSend(
                 new CommentUserNotification(getCommentService(), newComment, commentedContent,
                     componentName + "." + SUBJECT_COMMENT_ADDING, service.
                     getComponentMessages(""), recipients));
-            notifyUsers(notification);
           }
         } catch (Exception ex) {
           SilverLogger.getLogger(this).error(ex.getMessage(), ex);

@@ -23,8 +23,10 @@
  */
 package org.silverpeas.core.contribution.contentcontainer.content;
 
+import org.silverpeas.core.ResourceReference;
 import org.silverpeas.core.SilverpeasExceptionMessages;
 import org.silverpeas.core.persistence.jdbc.DBUtil;
+import org.silverpeas.core.persistence.jdbc.sql.JdbcSqlQuery;
 import org.silverpeas.core.util.JoinStatement;
 import org.silverpeas.core.util.ServiceProvider;
 import org.silverpeas.core.util.logging.SilverLogger;
@@ -233,19 +235,15 @@ public class ContentManager implements Serializable {
 
   /**
    * Return the ContentPeas corresponding to the given componentId
-   * @param sComponentId
+   * @param sComponentName
    * @return
    * @throws ContentManagerException
    */
-  public ContentPeas getContentPeas(String sComponentId) throws ContentManagerException {
-    // Get the ContentType
-    String sContentType = this.getContentType(sComponentId);
-
-
+  public ContentPeas getContentPeas(String sComponentName) throws ContentManagerException {
     // Get the ContentPeas from the ContentType
     for (ContentPeas s_acContentPea : acContentPeas) {
 
-      if (s_acContentPea.getType().equals(sContentType)) {
+      if (s_acContentPea.getType().equals(sComponentName)) {
 
         return s_acContentPea;
       }
@@ -494,7 +492,7 @@ public class ContentManager implements Serializable {
   public int getContentInstanceId(String sComponentId) throws ContentManagerException {
     int contentInstanceId = -1;
 
-    String sContentInstanceId = getInstanceId(sComponentId);
+    String sContentInstanceId = getResourceReferencesByContentIds(sComponentId);
     if (sContentInstanceId != null) {
       contentInstanceId = Integer.parseInt(sContentInstanceId);
     } else {
@@ -552,46 +550,24 @@ public class ContentManager implements Serializable {
    * @param alSilverContentId - la liste de silvercontentId silvercontentId
    * @return la liste contenant les instances
    */
-  public List<String> getInstanceId(List<Integer> alSilverContentId)
+  public List<ResourceReference> getResourceReferencesByContentIds(List<Integer> alSilverContentId)
       throws ContentManagerException {
-    Connection connection = null;
-    PreparedStatement prepStmt = null;
-    ResultSet resSet = null;
-    List<String> alInstanceIds = new ArrayList<>();
     try {
-      // Open connection
-      connection = DBUtil.openConnection();
-
-      String sSQLStatement =
-          "select I.componentId from " + INSTANCE_TABLE + " I, " + SILVER_CONTENT_TABLE + " C " +
-              " where I.instanceId = C.contentInstanceId " + " and C.silverContentId = ?";
-
-      // Execute the search
-      prepStmt = connection.prepareStatement(sSQLStatement);
-
-      // Loop on the alSilverContentId
-      String instanceId = "";
-      for (Integer oneSilverContentId : alSilverContentId) {
-        prepStmt.setInt(1, oneSilverContentId);
-        resSet = prepStmt.executeQuery();
-        if (resSet.next()) {
-          instanceId = resSet.getString(1);
-        }
-        if (!alInstanceIds.contains(instanceId)) {
-          alInstanceIds.add(instanceId);
-        }
-
-        DBUtil.close(resSet);
-        resSet = null;
-      }
-
-      return alInstanceIds;
+      final List<ResourceReference> result = new ArrayList<>();
+      JdbcSqlQuery.executeBySplittingOn(alSilverContentId, (idBatch, ignore) ->
+          JdbcSqlQuery.createSelect("C.internalcontentid, I.componentId ")
+              .from(INSTANCE_TABLE + " I")
+              .join(SILVER_CONTENT_TABLE + " C").on("I.instanceId = C.contentInstanceId")
+              .where("C.silverContentId").in(idBatch)
+              .execute(r -> {
+                final ResourceReference ref = new ResourceReference(r.getString(1), r.getString(2));
+                result.add(ref);
+                return null;
+              }));
+      return result;
     } catch (Exception e) {
       throw new ContentManagerException(
           failureOnGetting("instance id for content", alSilverContentId), e);
-    } finally {
-      DBUtil.close(resSet, prepStmt);
-      closeConnection(connection);
     }
   }
 
@@ -718,7 +694,7 @@ public class ContentManager implements Serializable {
     return mapBetweenComponentIdAndInstanceId;
   }
 
-  private String getInstanceId(String componentId) {
+  private String getResourceReferencesByContentIds(String componentId) {
     return getMapping().get(componentId);
   }
 
