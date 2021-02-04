@@ -27,7 +27,7 @@ import org.silverpeas.core.admin.service.OrganizationController;
 import org.silverpeas.core.admin.user.model.SilverpeasRole;
 import org.silverpeas.core.admin.user.model.User;
 import org.silverpeas.core.contribution.attachment.WebdavServiceProvider;
-import org.silverpeas.core.contribution.attachment.webdav.WebdavWopiFile;
+import org.silverpeas.core.contribution.attachment.webdav.WebdavWbeFile;
 import org.silverpeas.core.persistence.jcr.JcrDataConverter;
 import org.silverpeas.core.persistence.jdbc.DBUtil;
 import org.silverpeas.core.security.Securable;
@@ -43,7 +43,7 @@ import org.silverpeas.core.util.URLUtil;
 import org.silverpeas.core.util.file.FileRepositoryManager;
 import org.silverpeas.core.util.file.FileServerUtils;
 import org.silverpeas.core.util.file.FileUtil;
-import org.silverpeas.core.wopi.WopiFileEditionManager;
+import org.silverpeas.core.wbe.WbeHostManager;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.Serializable;
@@ -1005,7 +1005,7 @@ public class SimpleDocument implements Serializable, Securable {
    */
   public Optional<Boolean> editableSimultaneously() {
     if (getVersionMaster().isOpenOfficeCompatible() &&
-        WopiFileEditionManager.get().isHandled(new WebdavWopiFile(getVersionMaster()))) {
+        WbeHostManager.get().isHandled(new WebdavWbeFile(getVersionMaster()))) {
       return Optional.of(getVersionMaster().editableSimultaneously != null
           ? getVersionMaster().editableSimultaneously
           : defaultValueOfEditableSimultaneously());
