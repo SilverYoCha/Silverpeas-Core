@@ -27,11 +27,15 @@ import com.google.api.services.directory.model.User;
 import org.silverpeas.core.admin.domain.AbstractDomainDriver;
 import org.silverpeas.core.admin.domain.driver.googledriver.GoogleEntitySimpleAttributePathResolver.AttributePathDecoder;
 import org.silverpeas.core.admin.domain.model.DomainProperty;
+import org.silverpeas.core.admin.domain.synchro.annotation.SynchroAvatarThreadManager;
 import org.silverpeas.core.admin.service.AdminException;
 import org.silverpeas.core.admin.user.model.GroupDetail;
 import org.silverpeas.core.admin.user.model.UserDetail;
 import org.silverpeas.core.admin.user.model.UserFull;
+import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.bundle.SettingBundle;
+import org.silverpeas.kernel.util.Pair;
+import org.silverpeas.kernel.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,6 +47,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.silverpeas.core.admin.domain.DomainDriver.ActionConstants.ACTION_MASK_RO_PULL_USER;
 import static org.silverpeas.core.admin.domain.driver.googledriver.GoogleEntitySimpleAttributePathResolver.decodePath;
@@ -387,7 +392,7 @@ public class GoogleDriver extends AbstractDomainDriver {
     user.setLogin(u.getPrimaryEmail());
     user.setLastName(u.getName().getFamilyName());
     user.setFirstName(u.getName().getGivenName());
-    @SuppressWarnings("unchecked") final List<Map<String, String>> emails =
+    @SuppressWarnings({"unchecked", "rawtypes"}) final List<Map<String, String>> emails =
         (List<Map<String, String>>) u.getEmails();
     final String email = emails.stream()
         .filter(m -> "Work".equalsIgnoreCase(m.get("type")) || "Work".equalsIgnoreCase(m.get(
@@ -400,5 +405,22 @@ public class GoogleDriver extends AbstractDomainDriver {
     } else {
       user.setState(VALID);
     }
+    performAvatarSynchronization(u, user);
+  }
+
+  private void performAvatarSynchronization(final User u, final UserDetail user) {
+    of(settings.getBoolean("google.user.avatar.sync", false))
+        .filter(Boolean.TRUE::equals)
+        .map(b -> SynchroAvatarThreadManager.get())
+        .filter(SynchroAvatarThreadManager::isCollecting)
+        .filter(p -> StringUtil.isDefined(u.getThumbnailPhotoUrl()))
+        .map(m -> {
+          try {
+            return Pair.of(request().userPhoto(u.getId()), m);
+          } catch (AdminException e) {
+            throw new SilverpeasRuntimeException(e);
+          }
+        })
+        .ifPresent(p -> p.getSecond().addAvatarProcess(new GoogleAvatarSynchroProcess(this, p.getFirst(), user)));
   }
 }

@@ -24,11 +24,19 @@
 
 package org.silverpeas.core.webapi.admin.scim;
 
+import org.silverpeas.core.admin.domain.model.Domain;
+import org.silverpeas.core.admin.service.AdminException;
+import org.silverpeas.core.admin.service.Administration;
+import org.silverpeas.core.util.MemoizedSupplier;
 import org.silverpeas.core.web.rs.SilverpeasRequestContext;
+import org.silverpeas.kernel.bundle.SettingBundle;
 
 import javax.enterprise.context.RequestScoped;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
+
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 /**
  * The SCIM request context which handles the domain identifier data in addition to the data
@@ -38,15 +46,25 @@ import javax.servlet.http.HttpServletResponse;
 @RequestScoped
 class ScimRequestContext extends SilverpeasRequestContext {
 
-  private String domainId;
+  private Domain domain;
+  private final MemoizedSupplier<SettingBundle> domainSettings = new MemoizedSupplier<>(
+      () -> domain.getSettings());
 
   void init(final HttpServletRequest request, final HttpServletResponse response,
       final String domainId) {
     super.init(request, response);
-    this.domainId = domainId;
+    try {
+      this.domain = Administration.get().getDomain(domainId);
+    } catch (AdminException e) {
+      throw new WebApplicationException(e, NOT_FOUND);
+    }
   }
 
   String getDomainId() {
-    return domainId;
+    return domain != null ? domain.getId() : null;
+  }
+
+  SettingBundle getDomainSettings() {
+    return domainSettings.get();
   }
 }

@@ -70,6 +70,7 @@ public class LDAPSettings implements DriverSettings {
   private String usersFirstNameField = null;
   private String usersLastNameField = null;
   private String usersEmailField = null;
+  private String usersAvatarField = null;
   // Account activation
   private String usersAccountControl = null;
   private String usersDisabledAccountFlag = null;
@@ -144,6 +145,7 @@ public class LDAPSettings implements DriverSettings {
     usersFirstNameField = rs.getString("users.FirstNameField", null);
     usersLastNameField = rs.getString("users.LastNameField", null);
     usersEmailField = rs.getString("users.EmailField", "");
+    usersAvatarField = rs.getString("users.AvatarField", "");
     usersAccountControl = rs.getString("users.accountControl", "");
     usersDisabledAccountFlag = rs.getString("users.accountControl.disabledFlags", "");
 
@@ -281,6 +283,10 @@ public class LDAPSettings implements DriverSettings {
 
   public String getUsersEmailField() {
     return usersEmailField;
+  }
+
+  public String getUsersAvatarField() {
+    return usersAvatarField;
   }
 
   public String getUsersAccountControl() {

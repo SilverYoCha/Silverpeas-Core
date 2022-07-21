@@ -39,6 +39,7 @@ import edu.psu.swe.scim.spec.resources.ScimExtension;
 import edu.psu.swe.scim.spec.resources.ScimUser;
 import org.silverpeas.core.admin.PaginationPage;
 import org.silverpeas.core.admin.domain.model.Domain;
+import org.silverpeas.core.admin.domain.synchro.annotation.UserSynchroProcess;
 import org.silverpeas.core.admin.service.AdminException;
 import org.silverpeas.core.admin.service.Administration;
 import org.silverpeas.core.admin.user.model.User;
@@ -72,12 +73,13 @@ import static org.silverpeas.core.webapi.admin.scim.SilverpeasScimServerConverte
 @Service
 public class ScimUserAdminService extends AbstractScimAdminService implements Provider<ScimUser> {
 
+  @UserSynchroProcess
   @Override
   public ScimUser create(final ScimUser resource) throws UnableToCreateResourceException {
     logger().debug(() -> "creating user " + resource);
     validateDomainExists();
     try {
-      final UserFull user = convert(resource);
+      final UserFull user = convert(scimRequestContext, resource);
       user.setDomainId(scimRequestContext.getDomainId());
       if (isNotDefined(user.getLastName())) {
         logger().debug(() -> "using 'UserName' SCIM attribute for user last name");
@@ -99,6 +101,7 @@ public class ScimUserAdminService extends AbstractScimAdminService implements Pr
     }
   }
 
+  @UserSynchroProcess
   @Override
   public ScimUser update(final UpdateRequest<ScimUser> updateRequest)
       throws UnableToUpdateResourceException {
@@ -113,7 +116,7 @@ public class ScimUserAdminService extends AbstractScimAdminService implements Pr
       validateDomainExists();
       try {
         final UserFull user = getUserById(updateRequest.getId());
-        applyTo(resource, user);
+        applyTo(scimRequestContext, resource, user);
         return update(user);
       } catch (Exception e) {
         throw new UnableToUpdateResourceException(NOT_FOUND, e.getMessage());
@@ -129,7 +132,7 @@ public class ScimUserAdminService extends AbstractScimAdminService implements Pr
         final PatchOperationApplier operationApplier = new PatchOperationApplier(scimUser);
         updateRequest.getPatchOperations().forEach(operationApplier::apply);
         final UserFull user = getUserById(updateRequest.getId());
-        applyTo(scimUser, user);
+        applyTo(scimRequestContext, scimUser, user);
         return update(user);
       } catch (Exception e) {
         throw new UnableToUpdateResourceException(NOT_FOUND, e.getMessage());

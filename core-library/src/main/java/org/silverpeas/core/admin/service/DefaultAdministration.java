@@ -41,6 +41,7 @@ import org.silverpeas.core.admin.domain.synchro.SynchroDomainScheduler;
 import org.silverpeas.core.admin.domain.synchro.SynchroGroupManager;
 import org.silverpeas.core.admin.domain.synchro.SynchroGroupReport;
 import org.silverpeas.core.admin.domain.synchro.SynchroGroupScheduler;
+import org.silverpeas.core.admin.domain.synchro.annotation.UserSynchroProcess;
 import org.silverpeas.core.admin.persistence.AdminPersistenceException;
 import org.silverpeas.core.admin.quota.exception.QuotaException;
 import org.silverpeas.core.admin.quota.model.Quota;
@@ -4298,6 +4299,7 @@ class DefaultAdministration implements Administration {
     }
   }
 
+  @UserSynchroProcess
   @Override
   public String synchronizeUser(String userId, boolean recurs) throws AdminException {
     Collection<UserDetail> listUsersUpdate = new ArrayList<>();
@@ -4412,11 +4414,13 @@ class DefaultAdministration implements Administration {
     return userId;
   }
 
+  @UserSynchroProcess
   @Override
   public String synchronizeSilverpeasWithDomain(String sDomainId) throws AdminException {
     return synchronizeSilverpeasWithDomain(sDomainId, false);
   }
 
+  @UserSynchroProcess
   @Override
   public String synchronizeSilverpeasWithDomain(String sDomainId, boolean threaded)
       throws AdminException {

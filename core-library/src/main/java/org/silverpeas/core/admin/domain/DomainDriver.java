@@ -177,6 +177,8 @@ public interface DomainDriver {
 
   void init(int domainId, String initParam, String authenticationServer) throws AdminException;
 
+  int getDomainId();
+
   String[] getPropertiesNames();
 
   DomainProperty getProperty(String propName);

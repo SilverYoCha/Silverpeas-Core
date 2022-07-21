@@ -23,17 +23,21 @@
  */
 package org.silverpeas.core.admin.domain.driver.ldapdriver;
 
+import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPEntry;
 import org.silverpeas.core.admin.domain.DomainDriver;
 import org.silverpeas.core.admin.domain.model.DomainProperty;
 import org.silverpeas.core.admin.domain.synchro.SynchroDomainReport;
+import org.silverpeas.core.admin.domain.synchro.annotation.SynchroAvatarThreadManager;
 import org.silverpeas.core.admin.service.AdminException;
 import org.silverpeas.core.admin.user.UserManager;
 import org.silverpeas.core.admin.user.constant.UserState;
 import org.silverpeas.core.admin.user.model.UserDetail;
 import org.silverpeas.core.admin.user.model.UserFull;
+import org.silverpeas.core.util.ArrayUtil;
 import org.silverpeas.core.util.CollectionUtil;
+import org.silverpeas.kernel.util.Pair;
 import org.silverpeas.kernel.util.StringUtil;
 
 import java.util.ArrayList;
@@ -43,9 +47,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.silverpeas.core.SilverpeasExceptionMessages.undefined;
 import static org.silverpeas.core.admin.domain.driver.ldapdriver.LDAPUtility.getFirstAttributeValue;
@@ -250,6 +256,24 @@ public class LDAPUser {
         getFirstAttributeValue(ldapUser, driverSettings.getUsersEmailField()));
 
     silverpeasDistantUser.setAccessLevel(null); // Put the default access level (user)...
+    performAvatarSynchronization(ldapUser, silverpeasDistantUser);
+  }
+
+  private void performAvatarSynchronization(final LDAPEntry ldapUser, final UserDetail user) {
+    ofNullable(driverSettings.getUsersAvatarField())
+        .filter(StringUtil::isDefined)
+        .map(f -> {
+          final SynchroAvatarThreadManager manager = SynchroAvatarThreadManager.get();
+          if (manager.isCollecting()) {
+            return ofNullable(ldapUser.getAttribute(f))
+                .map(LDAPAttribute::getByteValue)
+                .filter(Predicate.not(ArrayUtil::isEmpty))
+                .map(b -> Pair.of(b, manager))
+                .orElse(null);
+          }
+          return null;
+        })
+        .ifPresent(p -> p.getSecond().addAvatarProcess(new LDAPAvatarSynchroProcess(driverParent, user, p.getFirst())));
   }
 
   /**

@@ -27,13 +27,18 @@ package org.silverpeas.core.webapi.admin.scim;
 import edu.psu.swe.scim.spec.resources.Email;
 import edu.psu.swe.scim.spec.resources.Name;
 import edu.psu.swe.scim.spec.resources.ScimUser;
+import org.silverpeas.core.admin.domain.synchro.annotation.SynchroAvatarThreadManager;
 import org.silverpeas.core.admin.user.constant.UserState;
 import org.silverpeas.core.admin.user.model.User;
 import org.silverpeas.core.admin.user.model.UserDetail;
 import org.silverpeas.core.admin.user.model.UserFull;
+import org.silverpeas.kernel.util.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.silverpeas.kernel.util.StringUtil.isDefined;
 import static org.silverpeas.kernel.util.StringUtil.isNotDefined;
 
@@ -47,17 +52,17 @@ class SilverpeasScimServerConverter {
   private SilverpeasScimServerConverter() {
   }
 
-  static UserFull convert(ScimUser scimUser) {
+  static UserFull convert(final ScimRequestContext context, ScimUser scimUser) {
     if (scimUser == null) {
       return null;
     }
     final UserFull user = new UserFull();
     user.setId(decodeUserId(scimUser.getId()));
-    applyTo(scimUser, user);
+    applyTo(context, scimUser, user);
     return user;
   }
 
-  static void applyTo(ScimUser scimUser, UserFull user) {
+  static void applyTo(final ScimRequestContext context, ScimUser scimUser, UserFull user) {
     user.setSpecificId(scimUser.getExternalId());
     final Name name = scimUser.getName();
     if (name != null) {
@@ -75,14 +80,34 @@ class SilverpeasScimServerConverter {
     user.setEmailAddress(email);
     user.setPassword(scimUser.getPassword());
     if (!user.isRemovedState()) {
-      if (scimUser.getActive()) {
+      if (Boolean.TRUE.equals(scimUser.getActive())) {
         if (user.isDeactivatedState() || user.isDeletedState()) {
           user.setState(UserState.VALID);
         }
+        performAvatarSynchronization(context, scimUser, user);
       } else {
         user.setState(UserState.DEACTIVATED);
       }
     }
+  }
+
+  private static void performAvatarSynchronization(final ScimRequestContext context, final ScimUser u, final UserDetail user) {
+    of(context.getDomainSettings().getBoolean("scim.user.avatar.sync", false))
+        .filter(Boolean.TRUE::equals)
+        .map(f -> {
+          final SynchroAvatarThreadManager manager = SynchroAvatarThreadManager.get();
+          if (manager.isCollecting()) {
+            return  ofNullable(u.getPhotos()).stream()
+                .flatMap(List::stream)
+                .filter(p -> isDefined(p.getType()))
+                .filter(p -> isDefined(p.getValue()))
+                .map(b -> Pair.of(b, manager))
+                .findFirst()
+                .orElse(null);
+          }
+          return null;
+        })
+        .ifPresent(p -> p.getSecond().addAvatarProcess(new ScimAvatarSynchroProcess(context, u.getId(), p.getFirst(), user)));
   }
 
   static ScimUser convert(User user) {

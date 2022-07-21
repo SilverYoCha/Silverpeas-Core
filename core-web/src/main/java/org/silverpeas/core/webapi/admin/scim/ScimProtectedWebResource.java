@@ -24,10 +24,7 @@
 
 package org.silverpeas.core.webapi.admin.scim;
 
-import org.silverpeas.core.admin.domain.model.Domain;
 import org.silverpeas.core.admin.service.AdminController;
-import org.silverpeas.core.admin.service.AdminException;
-import org.silverpeas.core.admin.service.Administration;
 import org.silverpeas.core.admin.user.model.User;
 import org.silverpeas.core.util.ServiceProvider;
 import org.silverpeas.core.web.WebResourceUri;
@@ -40,11 +37,9 @@ import javax.ws.rs.WebApplicationException;
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.silverpeas.kernel.util.StringUtil.isNotDefined;
 import static org.silverpeas.core.webapi.admin.scim.ScimLogger.logger;
-import static org.silverpeas.core.webapi.admin.scim.ScimServerFilter
-    .PUSH_SILVERPEAS_AUTHORIZED_ADMIN_IDS_PROP_KEY;
+import static org.silverpeas.core.webapi.admin.scim.ScimServerFilter.PUSH_SILVERPEAS_AUTHORIZED_ADMIN_IDS_PROP_KEY;
 
 /**
  * <p>
@@ -63,13 +58,7 @@ public interface ScimProtectedWebResource extends ProtectedWebResource {
 
   @Override
   default void validateUserAuthorization(final UserPrivilegeValidation validation) {
-    Domain domain;
-    try {
-      domain = Administration.get().getDomain(getSilverpeasContext().getDomainId());
-    } catch (AdminException e) {
-      throw new WebApplicationException(e, NOT_FOUND);
-    }
-    final String authorizedUserIds = domain.getSettings()
+    final String authorizedUserIds = getSilverpeasContext().getDomainSettings()
         .getString(PUSH_SILVERPEAS_AUTHORIZED_ADMIN_IDS_PROP_KEY);
     if (isNotDefined(authorizedUserIds)) {
       final String error = format("Please verify the variable {0} into SCIM domain property file",

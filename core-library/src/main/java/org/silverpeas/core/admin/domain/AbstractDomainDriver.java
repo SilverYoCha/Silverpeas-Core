@@ -99,6 +99,11 @@ public abstract class AbstractDomainDriver implements DomainDriver {
   }
 
   @Override
+  public int getDomainId() {
+    return this.domainId;
+  }
+
+  @Override
   public String[] getPropertiesNames() {
     return keys;
   }
@@ -271,10 +276,6 @@ public abstract class AbstractDomainDriver implements DomainDriver {
    */
   protected static String idAsString(int id) {
     return String.valueOf(id);
-  }
-
-  protected int getDomainId() {
-    return domainId;
   }
 
   protected void setSynchroInProcess(boolean synchroInProcess) {

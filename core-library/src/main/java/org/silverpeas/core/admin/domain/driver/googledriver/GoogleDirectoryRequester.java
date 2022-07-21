@@ -32,6 +32,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.directory.Directory;
 import com.google.api.services.directory.DirectoryScopes;
 import com.google.api.services.directory.model.User;
+import com.google.api.services.directory.model.UserPhoto;
 import com.google.api.services.directory.model.Users;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -52,7 +53,7 @@ import java.util.List;
 /**
  * @author silveryocha
  */
-public class GoogleDirectoryRequester {
+class GoogleDirectoryRequester {
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   private static final int QUERY_MAX_RESULTS = 500;
   private static final String MY_CUSTOMER = "my_customer";
@@ -104,7 +105,7 @@ public class GoogleDirectoryRequester {
     }
   }
 
-  public List<User> users() throws AdminException {
+  List<User> users() throws AdminException {
     try {
       List<User> result = new LinkedList<>();
       final long start = System.currentTimeMillis();
@@ -148,6 +149,20 @@ public class GoogleDirectoryRequester {
       final long end = System.currentTimeMillis();
       SilverLogger.getLogger(this).debug(() -> MessageFormat
           .format("Getting account {0} in {1}", id,
+              DurationFormatUtils.formatDurationHMS(end - start)));
+    }
+  }
+
+  UserPhoto userPhoto(final String id) throws AdminException {
+    final long start = System.currentTimeMillis();
+    try {
+      return getDirectoryService().users().photos().get(id).execute();
+    } catch (IOException e) {
+      throw new AdminException(e);
+    } finally {
+      final long end = System.currentTimeMillis();
+      SilverLogger.getLogger(this).debug(() -> MessageFormat
+          .format("Getting account photo {0} in {1}", id,
               DurationFormatUtils.formatDurationHMS(end - start)));
     }
   }
