@@ -87,6 +87,8 @@ class WAComponentRegistryTest {
     assertThat(almanach.getDescription(), hasKey("fr"));
     assertThat(almanach.getDescription(), hasKey("en"));
     assertThat(almanach.isPortlet(), is(true));
+    assertThat(almanach.isInheritSpaceRightsByDefault(), is(true));
+    assertThat(almanach.isPublicByDefault(), is(false));
     assertThat(almanach.isVisible(), is(true));
     assertThat(almanach.isVisibleInPersonalSpace(), is(false));
     assertThat(almanach.getSuite().get("fr"), is("02 Gestion Collaborative"));
@@ -192,6 +194,8 @@ class WAComponentRegistryTest {
     component.getLabel().put("fr", label);
     component.getDescription().put("fr", "Le nouveau workflow");
     component.getSuite().put("fr", "80 Nouvelles applications");
+    component.setPublicByDefault(true);
+    component.setInheritSpaceRightsByDefault(false);
     component.setVisible(true);
     component.setPortlet(false);
 
