@@ -75,14 +75,6 @@ public interface OrganizationController extends java.io.Serializable {
   String[] getAllSubSpaceIds(String sSpaceId);
 
   /**
-   * Return the spaces name corresponding to the given space ids.
-   *
-   * @param asSpaceIds one or more space identifiers.
-   * @return the names of the specified spaces
-   */
-  String[] getSpaceNames(String[] asSpaceIds);
-
-  /**
    * Return the space light corresponding to the given space id
    *
    * @param spaceId the unique identifier of a space.
@@ -96,12 +88,12 @@ public interface OrganizationController extends java.io.Serializable {
   SpaceInst getSpaceInstById(String sSpaceId);
 
   /**
-   * Return the component ids available for the current user Id in the given space id
+   * Return the component ids available for the current user id in the given space id
    */
   String[] getAvailCompoIds(String sClientSpaceId, String sUserId);
 
   /**
-   * Return the component ids available for the current user Id
+   * Return the component ids available for the current user id
    */
   String[] getAvailCompoIds(String sUserId);
 
@@ -175,7 +167,7 @@ public interface OrganizationController extends java.io.Serializable {
   ComponentInstLight getComponentInstLight(String sComponentId);
 
   /**
-   * Return the full detail of the user with the given ldap Id
+   * Return the full detail of the user with the given ldap id
    */
   UserFull getUserFull(String sUserId);
 
@@ -185,12 +177,12 @@ public interface OrganizationController extends java.io.Serializable {
   List<UserFull> getUserFulls(Collection<String> userIds);
 
   /**
-   * Return the detail of the user with the given ldap Id
+   * Return the detail of the user with the given ldap id
    */
   <T extends User> T getUserDetail(String sUserId);
 
   /**
-   * Return an array of users corresponding to the given user Id array
+   * Return an array of users corresponding to the given user id array
    */
   <T extends User> T[] getUserDetails(String[] asUserIds);
 
@@ -246,17 +238,9 @@ public interface OrganizationController extends java.io.Serializable {
   int getAllSubUsersNumber(String sGroupId);
 
   /**
-   * For use in userPanel : return the direct sub-groups
+   * For use in userPanel : return the direct subgroups
    */
   <T extends Group> T[] getAllSubGroups(String parentGroupId);
-
-  /**
-   * Gets all the groups and sub groups that are children of the specified group.
-   * @param parentGroupId the unique identifier of a group.
-   * @param <T> the concrete type of the {@link Group} instances to return.
-   * @return an array with all the groups that are children of the specified group.
-   */
-  <T extends Group> T[] getRecursivelyAllSubgroups(String parentGroupId);
 
   /**
    * Return all the users of Silverpeas
@@ -324,7 +308,7 @@ public interface OrganizationController extends java.io.Serializable {
   String[] getAdministratorUserIds(String fromUserId);
 
   /**
-   * Return the Group of the group with the given Id
+   * Return the Group of the group with the given id
    */
   <T extends Group> T getGroup(String sGroupId);
 
@@ -344,7 +328,7 @@ public interface OrganizationController extends java.io.Serializable {
   <T extends Group> T[] getAllRootGroups();
 
   /**
-   * Get ALL the users that are in a group or his sub groups
+   * Get ALL the users that are in a group or his subgroups
    */
   <T extends User> T[] getAllUsersOfGroup(String groupId);
 
@@ -359,7 +343,7 @@ public interface OrganizationController extends java.io.Serializable {
   String[] getAllSpaceIds(String sUserId);
 
   /**
-   * Return all the spaces Id manageable by given user in Silverpeas
+   * Return all the spaces id manageable by given user in Silverpeas
    */
   String[] getUserManageableSpaceIds(String sUserId);
 
@@ -374,7 +358,7 @@ public interface OrganizationController extends java.io.Serializable {
   String[] getAllRootSpaceIds(String sUserId);
 
   /**
-   * Return all the subSpaces Id available in webactiv given a space id (driver format)
+   * Return all the subSpaces id available in webactiv given a space id (driver format)
    */
   String[] getAllSubSpaceIds(String sSpaceId, String sUserId);
 
@@ -405,7 +389,7 @@ public interface OrganizationController extends java.io.Serializable {
    * A component is an application in Silverpeas to perform some tasks and to manage some
    * resources.
    * Each component in Silverpeas can be instantiated several times, each of them corresponding
-   * then to a running application in Silverpeas and it is uniquely identified from others
+   * then to a running application in Silverpeas, and it is uniquely identified from others
    * instances by a given identifier.
    * @param userId the unique identifier of a user.
    * @return a list of component instance identifier as string.
@@ -418,7 +402,7 @@ public interface OrganizationController extends java.io.Serializable {
    * </p>
    * A component is an application in Silverpeas to perform some tasks and to manage some resources.
    * Each component in Silverpeas can be instantiated several times, each of them corresponding then
-   * to a running application in Silverpeas and it is uniquely identified from others instances by a
+   * to a running application in Silverpeas, and it is uniquely identified from others instances by a
    * given identifier.
    *
    * @param componentId the unique identifier of a component instance.
@@ -477,10 +461,6 @@ public interface OrganizationController extends java.io.Serializable {
    * @return true if the anonym access is activated, false otherwise.
    */
   boolean isAnonymousAccessActivated();
-
-  String[] getAllowedComponentIds(String userId);
-
-  <T extends User> List<T> getAllUsersFromNewestToOldest();
 
   <T extends User> List<T> getUsersOfDomainsFromNewestToOldest(List<String> domainIds);
 

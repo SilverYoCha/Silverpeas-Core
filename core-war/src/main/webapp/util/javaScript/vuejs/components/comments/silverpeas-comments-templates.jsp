@@ -48,6 +48,8 @@
 <fmt:message var="textNoComment" key="comment.noComment"/>
 <fmt:message var="textComment" key="comment.comment"/>
 <fmt:message var="textComments" key="comment.comments"/>
+<fmt:message var="textConnectToViewComments" key="comment.connectToView"/>
+<fmt:message var="textConnectToPostComments" key="comment.connectToComment"/>
 <fmt:message var="textMandatory" key="GML.requiredField"/>
 <c:choose>
   <c:when test="${selfRegistrationEnabled}">
@@ -94,10 +96,11 @@ other users. The update opens a popup to modify the text of the comment.
           v-if="!user.anonymous && !user.guestAccess">
       </silverpeas-comment-edition>
 
-      <div class="connection" v-if="user.anonymous">
+      <div class="inlineMessage connection" v-if="user.anonymous">
+        <p>${textConnectToPostComments}</p>
         <div class="buttons">
-          <button class="button logOn" onclick="top.location.href='${loginUrl}'">
-            {{ messages.loginAction }}
+          <button class="button logOn" v-on:click="goToLoginPage">
+            ${loginAction}
           </button>
         </div>
       </div>
@@ -139,16 +142,17 @@ other users. The update opens a popup to modify the text of the comment.
 
     <div v-if="user.anonymous && messages.anonymousViewMode === 'counter'">
 
-      <div class="commentsCount">
-        <span>{{ infoNbOfComments }}</span>
-      </div>
-
-      <div class="connection" v-if="user.anonymous">
+      <div class="inlineMessage connection" v-if="user.anonymous">
+        <p>${textConnectToViewComments}</p>
         <div class="buttons">
-          <button class="button logOn" onclick="top.location.href='${loginUrl}'">
-            {{ messages.loginAction }}
+          <button class="button logOn" v-on:click="goToLoginPage">
+            ${loginAction}
           </button>
         </div>
+      </div>
+
+      <div class="commentsCount">
+        <span>{{ infoNbOfComments }}</span>
       </div>
 
     </div>

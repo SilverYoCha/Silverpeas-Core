@@ -111,7 +111,7 @@ public class SilverListener
     final Runnable setupSessionCache;
     if (sessionInfo.isDefined()) {
       if (sessionInfo instanceof HTTPSessionInfo && !sessionInfo.isAnonymous()) {
-        // a non anonymous HTTP session
+        // a no anonymous HTTP session
         ((HTTPSessionInfo) sessionInfo).setHttpSession(httpSession);
       }
       setupSessionCache = () -> sessionCacheService.setCurrentSessionCache(sessionInfo.getCache());

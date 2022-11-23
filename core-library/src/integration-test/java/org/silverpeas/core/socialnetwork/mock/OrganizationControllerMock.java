@@ -91,11 +91,6 @@ public class OrganizationControllerMock implements OrganizationController {
   }
 
   @Override
-  public String[] getSpaceNames(final String[] asSpaceIds) {
-    return new String[0];
-  }
-
-  @Override
   public SpaceInstLight getSpaceInstLightById(final String spaceId) {
     return null;
   }
@@ -241,11 +236,6 @@ public class OrganizationControllerMock implements OrganizationController {
 
   @Override
   public Group[] getAllSubGroups(final String parentGroupId) {
-    return new Group[0];
-  }
-
-  @Override
-  public Group[] getRecursivelyAllSubgroups(final String parentGroupId) {
     return new Group[0];
   }
 
@@ -489,16 +479,6 @@ public class OrganizationControllerMock implements OrganizationController {
   @Override
   public boolean isAnonymousAccessActivated() {
     return false;
-  }
-
-  @Override
-  public String[] getAllowedComponentIds(final String userId) {
-    return new String[0];
-  }
-
-  @Override
-  public List<UserDetail> getAllUsersFromNewestToOldest() {
-    return null;
   }
 
   @Override

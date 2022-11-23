@@ -123,16 +123,6 @@ public class DefaultOrganizationController implements OrganizationController {
   }
 
   @Override
-  public String[] getSpaceNames(String[] asSpaceIds) {
-    try {
-      return getAdminService().getSpaceNames(asSpaceIds);
-    } catch (Exception e) {
-      SilverLogger.getLogger(this).error(e.getMessage(), e);
-      return ArrayUtil.emptyStringArray();
-    }
-  }
-
-  @Override
   public SpaceInstLight getSpaceInstLightById(String spaceId) {
     try {
       return getAdminService().getSpaceInstLightById(spaceId);
@@ -442,34 +432,12 @@ public class DefaultOrganizationController implements OrganizationController {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Group[] getRecursivelyAllSubgroups(final String parentGroupId) {
-    try {
-      return getAdminService().getRecursivelyAllSubGroups(parentGroupId);
-    } catch (Exception e) {
-      SilverLogger.getLogger(this).error(e.getMessage(), e);
-      return new Group[0];
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
   public UserDetail[] getAllUsers() {
     try {
       return getAdminService().getAllUsers().toArray(new UserDetail[0]);
     } catch (Exception e) {
       SilverLogger.getLogger(this).error(e.getMessage(), e);
       return new UserDetail[0];
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<UserDetail> getAllUsersFromNewestToOldest() {
-    try {
-      return getAdminService().getAllUsersFromNewestToOldest();
-    } catch (Exception e) {
-      SilverLogger.getLogger(this).error(e.getMessage(), e);
-      return Collections.emptyList();
     }
   }
 
@@ -1020,16 +988,6 @@ public class DefaultOrganizationController implements OrganizationController {
   @Override
   public boolean isAnonymousAccessActivated() {
     return UserDetail.isAnonymousUserExist();
-  }
-
-  @Override
-  public String[] getAllowedComponentIds(String userId) {
-    try {
-      return getAdminService().getAvailCompoIds(userId);
-    } catch (AdminException e) {
-      SilverLogger.getLogger(this).error(e.getMessage(), e);
-      return ArrayUtil.emptyStringArray();
-    }
   }
 
   @Override
