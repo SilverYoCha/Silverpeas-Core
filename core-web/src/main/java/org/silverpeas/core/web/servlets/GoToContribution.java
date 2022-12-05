@@ -37,13 +37,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.net.URLEncoder;
 
+import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 import static org.silverpeas.core.contribution.model.ContributionIdentifier.decode;
 import static org.silverpeas.core.util.StringUtil.fromBase64;
+import static org.silverpeas.core.util.URLUtil.getApplicationURL;
 
 /**
  * The servlet in charge of handling permalink of all {@link Contribution} implementations.
  */
 public class GoToContribution extends GoTo {
+  private static final long serialVersionUID = -5953875234057830718L;
 
   @Inject
   private ComponentInstanceRoutingMapProviderByInstance routingMapProvider;
@@ -61,9 +65,16 @@ public class GoToContribution extends GoTo {
         this.routingMapProvider.getByInstanceId(componentInstanceId);
     final URI page;
     User requester = User.getCurrentRequester();
-    if (requester != null && !requester.isAnonymous()) {
-      // a user is connected, going to the requested page
-      page = routingMap.relative().getViewPage(contributionId);
+    if (requester != null) {
+      // a user is connected or an anonymous session is open, going to the requested page
+      page = ofNullable(routingMap.relativeToSilverpeas().getPermalink(contributionId))
+          // If the computed permalink of the resource is not the one that permits to access the
+          // current servlet dedicated to resolve generic '/Contribution' path, then the
+          // component has not yet its implementation of {@link org.silverpeas.core.web.mvc.route
+          // .ComponentInstanceRoutingMap}. So redirecting to the right permalink
+          .filter(not(p -> p.toString().startsWith(getApplicationURL() + "/Contribution")))
+          // Otherwise, redirecting to the view page
+          .orElseGet(() -> routingMap.relative().getViewPage(contributionId));
     } else {
       // no user connected, playing again the permalink after a successful connexion
       page = routingMap.relativeToSilverpeas().getPermalink(contributionId);

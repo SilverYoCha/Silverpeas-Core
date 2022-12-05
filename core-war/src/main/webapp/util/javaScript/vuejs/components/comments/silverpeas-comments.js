@@ -107,7 +107,9 @@
           goToLoginPage: function() {
             const contribId = this.componentId + ':' + this.resourceType + ':' + this.resourceId;
             cache.put(contribId, '.commentsList');
-            top.location.href = webContext + '/Contribution/' + sp.base64.encode(contribId);
+            top.location.href = sp.url.format(webContext + '/Contribution/' + sp.base64.encode(contribId), {
+              forceToLogin : true
+            });
           },
           /**
            * Validates the specified text satisfies the requirement to be used as a comment's
